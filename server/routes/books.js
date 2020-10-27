@@ -25,33 +25,41 @@ router.get('/', (req, res, next) => {
 });
 
 //  GET the Book Details page in order to add a new Book
-router.get('/details', (req, res, next) => {
+router.get('/details/add', (req, res, next) => {
 
     /*****************
      * ADD CODE HERE *
      *****************/
 
-    res.render('books/details', 
-    {title: 'Add Book', 
-    books: book });
+    book.find( (err, books) => {
+        if (err) {
+          return console.error(err);
+        }
+        else {
+          res.render('books/details', {
+            title: 'Add Book',
+            books: books
+          });
+        }
+      });
 });
 
 // POST process the Book Details page and create a new Book - CREATE
-router.post('/details', (req, res, next) => {
+router.post('/details/add', (req, res, next) => {
 
     /*****************
      * ADD CODE HERE *
      *****************/
 
-    let newBook = book({
-      "Title": req.body.Title,
-      "Price": req.body.Price,
-      "Author": req.body.Author,
-      "Genre": req.body.Genre
+    let newBook = new book({
+      "Title": req.body.title,
+      "Price": req.body.price,
+      "Author": req.body.author,
+      "Genre": req.body.genre
      
          });
      
-         book.create(newBook, (err, book)=>{
+         book.create(newBook, (err)=>{
              if(err){
                  console.log(err);
                  res.end(err);
@@ -67,7 +75,7 @@ router.post('/details', (req, res, next) => {
 });
 
 // GET the Book Details page in order to edit an existing Book
-router.get('/edit/:id', (req, res, next) => {
+router.get('/details/:id', (req, res, next) => {
 
     /*****************
      * ADD CODE HERE *
@@ -75,7 +83,7 @@ router.get('/edit/:id', (req, res, next) => {
 
     let id = req.params.id;
     
-    book.findById(id, (err, book) => {
+    book.findById(id, (err, editBook) => {
     if(err){
         console.log(err)
         res.end(err);
@@ -83,13 +91,13 @@ router.get('/edit/:id', (req, res, next) => {
     else{
         res.render('books/details', 
         {title: 'Edit Book', 
-        books: book})
+        books: editBook})
     }
     });
 });
 
 // POST - process the information passed from the details form and update the document
-router.post('/edit/:id', (req, res, next) => {
+router.post('/details/:id', (req, res, next) => {
 
     /*****************
      * ADD CODE HERE *
@@ -97,20 +105,21 @@ router.post('/edit/:id', (req, res, next) => {
 
     let id = req.params.id;
     
-    let updatedBook = book({
+    let updateBooks = book({
         "_id": id,
-        "Title": req.body.Title,
-      "Price": req.body.Price,
-      "Author": req.body.Author,
-      "Genre": req.body.Genre
+        "Title": req.body.title,
+      "Price": req.body.price,
+      "Author": req.body.author,
+      "Genre": req.body.genre
     });
     
-    book.updateOne({_id: id}, updatedBook, (err) => {
+    book.update({_id: id}, updateBooks, (err) => {
         if(err){
             console.log(err);
             res.end(err);
         }
         else{
+        
             res.redirect('/books');
         }
     });
