@@ -2,6 +2,7 @@
 let express = require('express');
 let router = express.Router();
 let mongoose = require('mongoose');
+const books = require('../models/books');
 
 // define the book model
 let book = require('../models/books');
@@ -24,33 +25,33 @@ router.get('/', (req, res, next) => {
 });
 
 //  GET the Book Details page in order to add a new Book
-router.get('/add', (req, res, next) => {
+router.get('/details', (req, res, next) => {
 
     /*****************
      * ADD CODE HERE *
      *****************/
-    res.render('books/add', 
+
+    res.render('books/details', 
     {title: 'Add Book', 
-    displayName: req.user ? req.user.displayName : ''});
+    books: book });
 });
 
 // POST process the Book Details page and create a new Book - CREATE
-router.post('/add', (req, res, next) => {
+router.post('/details', (req, res, next) => {
 
     /*****************
      * ADD CODE HERE *
      *****************/
 
-    let newBook = Book({
+    let newBook = book({
       "Title": req.body.Title,
-      "Description": req.body.Description,
       "Price": req.body.Price,
       "Author": req.body.Author,
       "Genre": req.body.Genre
      
          });
      
-         book.create(newBook, (err, Book)=>{
+         book.create(newBook, (err, book)=>{
              if(err){
                  console.log(err);
                  res.end(err);
@@ -66,7 +67,7 @@ router.post('/add', (req, res, next) => {
 });
 
 // GET the Book Details page in order to edit an existing Book
-router.get('/:id', (req, res, next) => {
+router.get('/edit/:id', (req, res, next) => {
 
     /*****************
      * ADD CODE HERE *
@@ -74,7 +75,7 @@ router.get('/:id', (req, res, next) => {
 
     let id = req.params.id;
     
-    book.findById(id, (err, bookToEdit) => {
+    book.findById(id, (err, book) => {
     if(err){
         console.log(err)
         res.end(err);
@@ -82,13 +83,13 @@ router.get('/:id', (req, res, next) => {
     else{
         res.render('books/details', 
         {title: 'Edit Book', 
-        book: bookToEdit, displayName: req.user ? req.user.displayName : ''})
+        books: book})
     }
     });
 });
 
 // POST - process the information passed from the details form and update the document
-router.post('/:id', (req, res, next) => {
+router.post('/edit/:id', (req, res, next) => {
 
     /*****************
      * ADD CODE HERE *
@@ -99,7 +100,6 @@ router.post('/:id', (req, res, next) => {
     let updatedBook = book({
         "_id": id,
         "Title": req.body.Title,
-      "Description": req.body.Description,
       "Price": req.body.Price,
       "Author": req.body.Author,
       "Genre": req.body.Genre
